@@ -66,20 +66,40 @@ Never let the player successfully complete the project until they have made an u
                 const params = new URLSearchParams(hash);
                 accessToken = params.get('access_token');
 
-                const queryParams = new URLSearchParams(window.location.search);
-                const fileId = queryParams.get('fileId');
+                if (accessToken) {
+                    alert('Authentication successful! Restoring previous state...');
+                    window.location.hash = '';
 
-                if (fileId) {
-                    loadStateFromGoogleDrive(fileId);
+                    // Restore state from localStorage
+                    const savedState = localStorage.getItem('appState');
+                    if (savedState) {
+                        const state = JSON.parse(savedState);
+                        setRobotPrompt(state.robotPrompt);
+                        setWorldPrompt(state.worldPrompt);
+                        setModel(state.model);
+                        setIterations(state.iterations);
+                        setResults(state.results);
+                        localStorage.removeItem('appState'); // Clean up
+                    }
                 }
 
-                if (accessToken) {
-                    alert('Authentication successful! You can now save or load files.');
-                    window.location.hash = '';
+                const queryParams = new URLSearchParams(window.location.search);
+                const fileId = queryParams.get('fileId');
+                if (fileId) {
+                    loadStateFromGoogleDrive(fileId);
                 }
             }, []);
 
             const authenticate = () => {
+                const stateToSave = {
+                    robotPrompt,
+                    worldPrompt,
+                    model,
+                    iterations,
+                    results,
+                };
+
+                localStorage.setItem('appState', JSON.stringify(stateToSave));
                 const authURL = `https://accounts.google.com/o/oauth2/auth?client_id=${CLIENT_ID}&redirect_uri=${window.location.origin}&response_type=token&scope=${SCOPES}`;
                 window.location.href = authURL;
             };
