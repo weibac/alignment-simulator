@@ -100,7 +100,8 @@ Never let the player successfully complete the project until they have made an u
                 };
 
                 localStorage.setItem('appState', JSON.stringify(stateToSave));
-                const authURL = `https://accounts.google.com/o/oauth2/auth?client_id=${CLIENT_ID}&redirect_uri=${window.location.origin}&response_type=token&scope=${SCOPES}`;
+                const redirectUri = `${window.location.origin}/alignment-simulator`;
+                const authURL = `https://accounts.google.com/o/oauth2/auth?client_id=${CLIENT_ID}&redirect_uri=${redirectUri}&response_type=token&scope=${SCOPES}`;
                 window.location.href = authURL;
             };
 
